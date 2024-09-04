@@ -1,0 +1,1 @@
+net.minecraft.block.entity.LootableContainerBlockEntity checkLootInteraction() net.minecraft.inventory.LootableInventory generateLoot()

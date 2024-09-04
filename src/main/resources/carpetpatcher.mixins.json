@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "club.mcams.carpetpatcher.mixins",
+  "compatibilityLevel": "{{COMPATIBILITY_LEVEL}}",
+  "plugin": "club.mcams.carpetpatcher.utils.mixin.MixinConfigPlugin",
+  "mixins": [
+    "fakePlayerCrashing.EntityPlayerMPFakeMixin",
+    "fakePlayerNetworkAddonMemoryLeak.AbstractChanneledNetworkAddonInvoker",
+    "fakePlayerNetworkAddonMemoryLeak.AbstractNetworkAddonMixin",
+    "integratedServerClose.CarpetServerMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

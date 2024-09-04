@@ -4,25 +4,24 @@
   "version": "${version}",
 
   "name": "${name}",
-  "description": "Template for my fabric mods",
+  "description": "Patch some carpet bugs",
   "authors": [
-    "Fallen_Breath"
+    "WenDavid"
   ],
   "contact": {
-    "homepage": "https://modrinth.com",
-    "sources": "https://github.com/Fallen-Breath/fabric-mod-template"
+    "sources": "https://github.com/wendavid552/Carpet-Patcher"
   },
 
-  "icon": "assets/template_mod/icon.png",
+  "icon": "assets/carpetpatcher/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.fallenbreath.template_mod.TemplateMod"
+      "club.mcams.carpetpatcher.CarpetPatcherMod"
     ]
   },
   "mixins": [
-    "template_mod.mixins.json"
+    "carpetpatcher.mixins.json"
   ],
 
   "depends": {

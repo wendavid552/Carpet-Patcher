@@ -1,5 +1,5 @@
 apply plugin: 'maven-publish'
-apply plugin: 'com.github.hierynomus.license'
+//apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'fabric-loom'
 apply plugin: 'com.replaymod.preprocess'
 apply plugin: 'me.fallenbreath.yamlang'
@@ -12,10 +12,19 @@ preprocess {
 
 repositories {
 	maven {
-		url 'https://jitpack.io'
+		url 'https://masa.dy.fi/maven'
 	}
 	maven {
 		url 'https://maven.fallenbreath.me/releases'
+	}
+	maven {
+		url 'https://maven.bawnorton.com/releases'
+	}
+	maven {
+		url 'https://jitpack.io'
+	}
+	maven {
+        url 'https://www.cursemaven.com'
 	}
 }
 
@@ -31,20 +40,29 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// runtime mods
-//	if (mcVersion < 11904) {
-//		modRuntimeOnly(mcVersion < 11900 ? "com.github.astei:lazydfu:0.1.2" : "com.github.Fallen-Breath:lazydfu:a7cfc44c0c")
-//	}
-//	// [FEATURE] MIXIN_AUDITOR
-//	modRuntimeOnly 'me.fallenbreath:mixin-auditor:0.1.0'
+	if (mcVersion < 11904) {
+		modRuntimeOnly(mcVersion < 11900 ? "com.github.astei:lazydfu:0.1.2" : "com.github.Fallen-Breath:lazydfu:a7cfc44c0c")
+	}
+	// [FEATURE] MIXIN_AUDITOR
+	modRuntimeOnly 'me.fallenbreath:mixin-auditor:0.1.0'
 
 	// dependencies
-//	include(modImplementation(fabricApi.module("fabric-resource-loader-v0", project.fabric_api_version)))
-//	include(modImplementation("me.fallenbreath:conditional-mixin-fabric:${project.conditionalmixin_version}"))
-//	include(annotationProcessor(implementation("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
+	if (project.carpet_core_version.startsWith('com.github.gnembon:fabric-carpet:')) {
+		modImplementation project.carpet_core_version  // jitpack
+	} else {
+		modImplementation "carpet:fabric-carpet:${project.carpet_core_version}"  // masa's maven
+	}
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	//library mods
+
+	include(modImplementation("me.fallenbreath:conditional-mixin-fabric:${project.conditionalmixin_version}"))
+	include(annotationProcessor(implementation("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
+	include(implementation(annotationProcessor("com.bawnorton.mixinsquared:mixinsquared-fabric:${project.mixinsquared_version}")))
 }
 
-String MIXIN_CONFIG_PATH = 'template_mod.mixins.json'
-String LANG_DIR = 'assets/template_mod/lang'
+String MIXIN_CONFIG_PATH = 'carpetpatcher.mixins.json'
+String LANG_DIR = 'assets/carpetpatcher/lang'
 JavaVersion JAVA_COMPATIBILITY
 if (mcVersion >= 12005) {
 	JAVA_COMPATIBILITY = JavaVersion.VERSION_21
@@ -58,22 +76,29 @@ if (mcVersion >= 12005) {
 JavaVersion MIXIN_COMPATIBILITY_LEVEL = JAVA_COMPATIBILITY
 
 loom {
-	def commonVmArgs = ['-Dmixin.debug.export=true', '-Dmixin.debug.countInjections=true']
+	def commonVmArgs = ['-Dmixin.debug.export=true']
+	if (mcVersion < 11904) {
+		// carpet 1.4.100+v230314 for mc1.19.4 and above
+		// fail to pass the check on at MinecraftServer_pingPlayerSampleLimit#modifyPlayerSampleLimit
+		// see https://github.com/gnembon/fabric-carpet/pull/1938
+
+	}
+	commonVmArgs.add('-Dmixin.debug.countInjections=true')
 	runConfigs.configureEach {
 		// to make sure it generates all "Minecraft Client (:subproject_name)" applications
 		ideConfigGenerated = true
 		runDir '../../run'
 		vmArgs commonVmArgs
 	}
-//	// [FEATURE] MIXIN_AUDITOR
-//	runs {
-//		def auditVmArgs = ['-DmixinAuditor.audit=true']
-//		serverMixinAudit {
-//			server()
-//			vmArgs auditVmArgs
-//			ideConfigGenerated false
-//		}
-//	}
+	// [FEATURE] MIXIN_AUDITOR
+	runs {
+		def auditVmArgs = ['-DmixinAuditor.audit=true']
+		serverMixinAudit {
+			server()
+			vmArgs auditVmArgs
+			ideConfigGenerated false
+		}
+	}
 }
 
 remapJar {
@@ -172,39 +197,39 @@ jar {
 }
 
 // https://github.com/hierynomus/license-gradle-plugin
-license {
-	// use "gradle licenseFormat" to apply license headers
-	header = rootProject.file('HEADER.txt')
-	include '**/*.java'
-	skipExistingHeaders = true
-
-	headerDefinitions {
-		// ref: https://github.com/mathieucarbou/license-maven-plugin/blob/4c42374bb737378f5022a3a36849d5e23ac326ea/license-maven-plugin/src/main/java/com/mycila/maven/plugin/license/header/HeaderType.java#L48
-		// modification: add a newline at the end
-		SLASHSTAR_STYLE_NEWLINE {
-			firstLine = "/*"
-			beforeEachLine = " * "
-			endLine = " */" + System.lineSeparator()
-			afterEachLine = ""
-			skipLinePattern = null
-			firstLineDetectionPattern = "(\\s|\\t)*/\\*.*\$"
-			lastLineDetectionPattern = ".*\\*/(\\s|\\t)*\$"
-			allowBlankLines = false
-			isMultiline = true
-			padLines = false
-		}
-	}
-	mapping {
-		java = 'SLASHSTAR_STYLE_NEWLINE'
-	}
-	ext {
-		name = project.mod_name
-		author = 'Fallen_Breath'
-		year = Calendar.getInstance().get(Calendar.YEAR).toString()
-	}
-}
-classes.dependsOn licenseFormatMain
-testClasses.dependsOn licenseFormatTest
+//license {
+//	// use "gradle licenseFormat" to apply license headers
+//	header = rootProject.file('HEADER.txt')
+//	include '**/*.java'
+//	skipExistingHeaders = true
+//
+//	headerDefinitions {
+//		// ref: https://github.com/mathieucarbou/license-maven-plugin/blob/4c42374bb737378f5022a3a36849d5e23ac326ea/license-maven-plugin/src/main/java/com/mycila/maven/plugin/license/header/HeaderType.java#L48
+//		// modification: add a newline at the end
+//		SLASHSTAR_STYLE_NEWLINE {
+//			firstLine = "/*"
+//			beforeEachLine = " * "
+//			endLine = " */" + System.lineSeparator()
+//			afterEachLine = ""
+//			skipLinePattern = null
+//			firstLineDetectionPattern = "(\\s|\\t)*/\\*.*\$"
+//			lastLineDetectionPattern = ".*\\*/(\\s|\\t)*\$"
+//			allowBlankLines = false
+//			isMultiline = true
+//			padLines = false
+//		}
+//	}
+//	mapping {
+//		java = 'SLASHSTAR_STYLE_NEWLINE'
+//	}
+//	ext {
+//		name = project.mod_name
+//		author = 'WenDavid'
+//		year = Calendar.getInstance().get(Calendar.YEAR).toString()
+//	}
+//}
+//classes.dependsOn licenseFormatMain
+//testClasses.dependsOn licenseFormatTest
 
 // configure the maven publication
 publishing {
