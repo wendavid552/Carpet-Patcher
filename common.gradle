@@ -58,7 +58,7 @@ dependencies {
 
 	include(modImplementation("me.fallenbreath:conditional-mixin-fabric:${project.conditionalmixin_version}"))
 	include(annotationProcessor(implementation("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
-	include(annotationProcessor(implementation("com.bawnorton.mixinsquared:mixinsquared-fabric:${project.mixinsquared_version}")))
+	include(annotationProcessor(implementation("com.github.bawnorton:mixinsquared-fabric:${project.mixinsquared_version}")))
 }
 
 String MIXIN_CONFIG_PATH = 'carpetpatcher.mixins.json'
